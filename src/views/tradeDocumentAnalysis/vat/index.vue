@@ -4,12 +4,14 @@
     style="flex-shrink: 1; flex-grow: 1; width: calc(100vw - 230px)"
   >
     <ocr-layout
-      @resetId="() => (activeTextId = null)"
-      @tabs="tabs"
-      @changeActivePageIndex="changeActivePageIndex"
+      @resetId="handleResetId"
+      @tabs="handleTabs"
+      @changeActivePageIndex="handleChangeActivePageIndex"
       :data="documents"
+      :staticData="newStaticData"
+      @update:staticData="updateStaticData"
       v-model="page"
-      ref="documents"
+      ref="documentsRef"
     >
       <div class="search-box">
         <el-input
@@ -40,14 +42,14 @@
             pointer: i.position,
           }"
           @click="(e) => clickHandler(e, i, 'info')"
-          v-for="i in showPageData.content[0].info"
+          v-for="i in showPageData.content?.[0]?.info || []"
           :key="i.key"
         >
-          <td colspan="2" >{{ i.key }}</td>
-          <td style="word-break: break-all;" >{{ i.value }}</td>
+          <td colspan="2">{{ i.key }}</td>
+          <td style="word-break: break-all;">{{ i.value }}</td>
         </tr>
-        <template v-for="(item, index) in showPageData.content[0].commodity">
-          <tr v-bind:key="index">
+        <template v-for="(item, index) in showPageData.content?.[0]?.commodity || []" :key="index">
+          <tr>
             <td
               class="td-title"
               v-show="showPageData.content[0].commodity[index].length > 0"
@@ -66,7 +68,7 @@
             v-for="item in showPageData.content[0].commodity[index]"
             :key="item.key"
           >
-            <td >{{ item.key }}</td>
+            <td>{{ item.key }}</td>
             <td>{{ item.value }}</td>
           </tr>
         </template>
@@ -76,7 +78,7 @@
             pointer: i.position,
           }"
           @click="(e) => clickHandler(e, i, 'others')"
-          v-for="i in showPageData.content[0].others"
+          v-for="i in showPageData.content?.[0]?.others || []"
           :key="i.key"
         >
           <td colspan="2">{{ i.key }}</td>
@@ -86,152 +88,197 @@
     </ocr-layout>
   </div>
 </template>
-<script>
-import ocrLayout from './ocr-layout'
-import { staticData } from '../staticData'
+
+<script setup>
+import { ref, computed, watch, onMounted } from 'vue'
 import { cloneDeep } from 'lodash'
-export default {
-  data() {
+import ocrLayout from './ocr-layout.vue'
+import { staticData } from '../staticData'
+
+const props = defineProps({
+  documentData: {
+    type: Object,
+    default: () => {}
+  }
+})
+// Refs
+const documentsRef = ref(null)
+
+// Reactive state
+const activePageIndex = ref(0)
+const activeTextId = ref('')
+const page = ref({})
+const activeName = ref('')
+const activeDocumentIndex = ref(0)
+const tabsArray = ref([])
+const newStaticData = ref(props.documentData.documents)
+const documents = ref(props.documentData.documents[0].data)
+const activeTableType = ref('')
+const fieldName = ref('')
+const checkedNull = ref(false)
+const showPageData = ref({}) // 用作展示
+
+// Computed
+const originLocation = computed(() => {
+  return process.env.NODE_ENV === 'development'
+    ? 'https://beefeather-ng-front.lianyirong.com.cn//file-handle-web/file/image'
+    : `${window.location.origin}/file-handle-web/file/image`
+})
+
+// Methods
+const updateStaticData = (name) => {
+  const data = newStaticData.value.find((item) => item.name === name).data
+  console.log(data, "data")
+  documents.value = data
+}
+
+const handleChangeActivePageIndex = (index) => {
+  activePageIndex.value = index
+}
+
+const handleTabs = (activeDocIndex, activePageIdx) => {
+  activePageIndex.value = 0
+  activeDocumentIndex.value = activeDocIndex
+  tabsArray.value = documents.value.map((item, index) => {
     return {
-      activePageIndex: 0,
-      activeTextId: '',
-      page: {},
-      activeName: '',
-      activeDocumentIndex: 0,
-      tabsArray: [],
-      documents: staticData.vat,
-      activeTableType: '',
-      fieldName: '',
-      checkedNull: false,
-      showPageData: {} // 用作展示
+      name: `发票${index + 1}`
     }
-  },
-  components: { ocrLayout },
-  watch: {
-    checkedNull() {
-      this.fieldNameInput()
-    },
-    page: {
-      handler(val) {
-        this.showPageData = cloneDeep(val)
-      },
-      deep: true,
-      immediate: true // 立即执行
-    }
-  },
-  computed: {
-    originLocation() {
-      return process.env.NODE_ENV === 'development'
-        ? 'https://beefeather-ng-front.lianyirong.com.cn//file-handle-web/file/image'
-        : `${window.location.origin}/file-handle-web/file/image`
-    }
-  },
-  created() {
-    this.page = this.documents[0]
-    this.showPageData = cloneDeep(this.page)
+  })
+  fieldName.value = ''
+  checkedNull.value = false
+  activeName.value = tabsArray.value[activePageIdx].name
+}
 
-    this.tabsArray = this.documents.map((item, index) => {
-      return {
-        name: `发票${index + 1}`
-      }
+const handleClick = (tab) => {
+  tabsArray.value.forEach((item, index) => {
+    if (item.name === tab.paneName) {
+      documentsRef.value?.handleClick(index)
+    }
+  })
+  fieldName.value = ''
+  checkedNull.value = false
+}
+
+const clickHandler = (e, i, type) => {
+  if (i.value === '' || !i.position || i.position[0]?.length !== 4) {
+    return
+  }
+  const el =
+    e.target.nodeName === 'TR'
+      ? e.target.firstChild
+      : e.target.parentNode.firstChild
+  activeTextId.value = i.id
+  activeTableType.value = type
+  e = e || window.event
+  
+  // 使用自定义事件系统
+  if (documentsRef.value && window.$events) {
+    window.$events.trigger('click-ocr-el', {
+      el,
+      value: i.position
     })
-    this.activeName = this.tabsArray[0].name
-  },
-  methods: {
-    changeActivePageIndex(activePageIndex) {
-      this.activePageIndex = activePageIndex
-    },
-    tabs(activeDocumentIndex, activePageIndex) {
-      this.activePageIndex = 0
-      this.activeDocumentIndex = activeDocumentIndex
-      this.tabsArray = this.documents.map((item, index) => {
-        return {
-          name: `发票${index + 1}`
-        }
-      })
-      this.fieldName = ''
-      this.checkedNull = false
-      this.activeName = this.tabsArray[activePageIndex].name
-    },
-    handleClick(value) {
-      this.tabsArray.forEach((item, index) => {
-        if (item.name === value.name) {
-          this.$refs.documents.handleClick(index)
-        }
-      })
-      this.fieldName = ''
-      this.checkedNull = false
-    },
-    clickHandler(e, i, type) {
-      if (i.value === '' || i.position[0].length !== 4) {
-        return
-      }
-      const el =
-        e.target.nodeName === 'TR'
-          ? e.target.firstChild
-          : e.target.parentNode.firstChild
-      this.activeTextId = i.id
-      this.activeTableType = type
-      e = e || window.event
-      this.$refs.documents.$events.trigger('click-ocr-el', {
-        el,
-        value: i.position
-      })
-    },
-    uploadFileData(res) {
-      const data = res.data
-      data.map((item) => {
-        item.imagePath = `${this.originLocation}?filename=${encodeURIComponent(
-          item.imagePath
-        )}`
-      })
-      this.documents = data
-      this.page = this.documents[0]
-      this.showPageData = cloneDeep(this.page)
-      this.tabsArray = this.documents.map((item, index) => {
-        return {
-          name: `发票${index + 1}`
-        }
-      })
-      this.fieldName = ''
-      this.checkedNull = false
-      this.activeName = this.tabsArray[0].name
-    },
-    fieldNameInput() {
-      const fieldName = this.fieldName.toLowerCase()
-      this.activeTextId = ''
-      this.$refs.documents.pathValue = null
-      this.$refs.documents.activeText = null
-      this.showPageData.content[0] = this.fuzzySearch(fieldName, this.page.content[0], this.checkedNull)
-    },
-    fuzzySearch(keyword, data) {
-      const lowerKeyword = keyword.toLowerCase()
-
-      // 进行模糊搜索
-      const results = {
-        info: this.searchAndCheckEmpty(data.info, lowerKeyword),
-        commodity: data.commodity.map((subArray) => {
-          return this.searchAndCheckEmpty(subArray, lowerKeyword)
-        }),
-        others: this.searchAndCheckEmpty(data.others, lowerKeyword)
-      }
-
-      return results
-    },
-    // 辅助函数
-    searchAndCheckEmpty(categoryData, keyword, isNull = this.checkedNull) {
-      const results = categoryData.filter((item) => {
-        const isKeyMatch = item.key.toLowerCase().includes(keyword)
-        const isValueMatch = item.value.toLowerCase().includes(keyword)
-        const isNullMatch = isNull && item.value === ''
-        return (isKeyMatch || isValueMatch) && !isNullMatch
-      })
-      return results
-    }
   }
 }
+
+const uploadFileData = (res) => {
+  const data = res.data
+  data.map((item) => {
+    item.imagePath = `${originLocation.value}?filename=${encodeURIComponent(
+      item.imagePath
+    )}`
+    return item
+  })
+  documents.value = data
+  page.value = documents.value[0]
+  showPageData.value = cloneDeep(page.value)
+  tabsArray.value = documents.value.map((item, index) => {
+    return {
+      name: `发票${index + 1}`
+    }
+  })
+  fieldName.value = ''
+  checkedNull.value = false
+  activeName.value = tabsArray.value[0].name
+}
+
+const fieldNameInput = () => {
+  const fieldNameValue = fieldName.value.toLowerCase()
+  activeTextId.value = ''
+  
+  if (documentsRef.value) {
+    documentsRef.value.pathValue = null
+    documentsRef.value.activeText = null
+  }
+  
+  if (page.value.content && page.value.content[0]) {
+    showPageData.value.content[0] = fuzzySearch(fieldNameValue, page.value.content[0])
+  }
+}
+
+const fuzzySearch = (keyword, data) => {
+  const lowerKeyword = keyword.toLowerCase()
+
+  // 进行模糊搜索
+  const results = {
+    info: searchAndCheckEmpty(data.info, lowerKeyword),
+    commodity: data.commodity.map((subArray) => {
+      return searchAndCheckEmpty(subArray, lowerKeyword)
+    }),
+    others: searchAndCheckEmpty(data.others, lowerKeyword)
+  }
+
+  return results
+}
+
+// 辅助函数
+const searchAndCheckEmpty = (categoryData, keyword) => {
+  const results = categoryData.filter((item) => {
+    const isKeyMatch = item.key.toLowerCase().includes(keyword)
+    const isValueMatch = item.value.toLowerCase().includes(keyword)
+    const isNullMatch = checkedNull.value && item.value === ''
+    return (isKeyMatch || isValueMatch) && !isNullMatch
+  })
+  return results
+}
+
+const handleResetId = () => {
+  activeTextId.value = null
+}
+
+// Watch
+watch(checkedNull, () => {
+  fieldNameInput()
+})
+
+watch(
+  page,
+  (val) => {
+    showPageData.value = cloneDeep(val)
+  },
+  { deep: true, immediate: true }
+)
+
+// Lifecycle
+onMounted(() => {
+  page.value = documents.value[0]
+  showPageData.value = cloneDeep(page.value)
+
+  tabsArray.value = documents.value.map((item, index) => {
+    return {
+      name: `发票${index + 1}`
+    }
+  })
+  activeName.value = tabsArray.value[0].name
+})
+
+// Expose methods for parent component (if needed)
+defineExpose({
+  uploadFileData,
+  documentsRef
+})
 </script>
-<style lang="stylus">
+
+<style lang="scss" scoped>
 .pre-line {
   white-space: pre-line;
 }
@@ -242,16 +289,16 @@ export default {
   align-items: center;
   margin-bottom: 4px;
 
-  .el-checkbox__label {
+  :deep(.el-checkbox__label) {
     padding-left: 4px;
     color: #202D40;
   }
 
-  .el-checkbox {
+  :deep(.el-checkbox) {
     margin-left: 32px;
   }
 
-  .el-checkbox__input.is-checked+.el-checkbox__label {
+  :deep(.el-checkbox__input.is-checked + .el-checkbox__label) {
     color: #202D40;
   }
 }
