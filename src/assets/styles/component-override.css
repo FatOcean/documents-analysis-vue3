@@ -1,0 +1,107 @@
+/* 组件样式覆盖 - 统一设计风格 */
+
+/* 分页样式 */
+.pagination {
+  margin-top: var(--spacing-xl);
+  text-align: right;
+  background: var(--bg-white);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-small);
+}
+
+/* 自定义上传区域 */
+.custom-upload-area {
+  width: 100%;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-large);
+  background: var(--bg-hover);
+  padding: var(--spacing-xl);
+  min-height: 140px;
+  transition: var(--transition-fast);
+}
+
+.custom-upload-area:hover {
+  border-color: var(--primary-color);
+  background: var(--primary-light);
+}
+
+.upload-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-medium);
+  border: 2px dashed var(--border-color);
+  background: var(--bg-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: var(--transition-fast);
+}
+
+.upload-btn:hover {
+  border-color: var(--primary-color);
+  background: var(--primary-light);
+}
+
+.upload-btn .el-icon {
+  font-size: 24px;
+  color: var(--primary-color);
+}
+
+/* 文件预览 */
+.file-preview {
+  border-radius: var(--radius-medium);
+  box-shadow: var(--shadow-small);
+  transition: var(--transition-fast);
+}
+
+.file-preview:hover {
+  box-shadow: var(--shadow-medium);
+}
+
+/* 抽屉底部按钮 */
+.drawer-footer {
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-white);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+}
+
+/* 上传提示文字 */
+.upload-tips {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border-color);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  line-height: var(--line-height-loose);
+}
+
+/* 文件图标样式 */
+.icon-pdf {
+  background: linear-gradient(135deg, #ff5252 0%, #f44336 100%);
+}
+
+.icon-word {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+}
+
+.icon-excel {
+  background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+}
+
+.icon-zip {
+  background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+}
+
+.icon-image {
+  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+}
+
+.icon-file {
+  background: linear-gradient(135deg, #757575 0%, #616161 100%);
+}
+

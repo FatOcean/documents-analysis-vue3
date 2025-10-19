@@ -1,0 +1,71 @@
+/* 全局CSS变量 - 基于现代设计系统 */
+:root {
+  /* 主色调 - 蓝色系 */
+  --primary-color: #1677ff;
+  --primary-hover: #4096ff;
+  --primary-active: #0958d9;
+  --primary-light: #e6f4ff;
+  --primary-lighter: #bae0ff;
+  
+  /* 辅助色 */
+  --success-color: #52c41a;
+  --warning-color: #faad14;
+  --error-color: #ff4d4f;
+  --info-color: #1677ff;
+  
+  /* 中性色 */
+  --text-primary: #1d2129;
+  --text-secondary: #4e5969;
+  --text-tertiary: #86909c;
+  --text-disabled: #c9cdd4;
+  
+  /* 背景色 */
+  --bg-color: #f7f8fa;
+  --bg-white: #ffffff;
+  --bg-hover: #f2f3f5;
+  --bg-active: #e5e6eb;
+  
+  /* 边框色 */
+  --border-color: #e5e6eb;
+  --border-light: #f2f3f5;
+  --border-dark: #c9cdd4;
+  
+  /* 圆角 */
+  --radius-small: 4px;
+  --radius-medium: 8px;
+  --radius-large: 12px;
+  --radius-xlarge: 16px;
+  
+  /* 阴影 */
+  --shadow-small: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-large: 0 8px 24px rgba(0, 0, 0, 0.12);
+  
+  /* 字体 */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-xxl: 24px;
+  
+  /* 行高 */
+  --line-height-tight: 1.4;
+  --line-height-base: 1.5714;
+  --line-height-loose: 1.8;
+  
+  /* 间距 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-xxl: 24px;
+  
+  /* 过渡 */
+  --transition-fast: all 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
+  --transition-base: all 0.3s cubic-bezier(0.34, 0.69, 0.1, 1);
+  --transition-slow: all 0.5s cubic-bezier(0.34, 0.69, 0.1, 1);
+}
+

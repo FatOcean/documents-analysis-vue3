@@ -1,0 +1,289 @@
+.ocr-layout {
+  display: flex;
+  color: #202d40;
+  height: calc(100vh - 122px);
+  overflow: hidden;
+
+  * {
+    user-select: none;
+  }
+
+  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+
+  .ocr-inner {
+    flex-shrink: 1;
+    flex-grow: 1;
+    display: flex;
+    position: relative;
+    align-items: center;
+
+    .svg-mask {
+      pointer-events: none;
+      position: absolute;
+      top: 60px;
+      left: 16px;
+      z-index: 1;
+    }
+
+    .document-box {
+      border: 1px solid #e2e4e9;
+      width: 50%;
+      flex-shrink: 0;
+      flex-grow: 0;
+      height: 100%;
+
+      .tool-bar {
+        height: 38px;
+        line-height: 38px;
+        padding: 0 16px;
+        box-shadow: 0px 3px 8px 0px rgba(5, 18, 30, 0.08);
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+
+        >div {
+          flex: 1;
+          text-align: center;
+
+          &:last-child {
+            text-align: right;
+          }
+        }
+
+        .name {
+          text-align: left;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+
+        .number {
+          border-bottom: 1px solid #E3E8F0;
+          padding: 0 8px;
+
+          .el-input {
+            width: auto;
+
+            .el-input__inner {
+              max-width: 30px;
+              color:#999;
+              position: relative;
+              left: -4px;
+              border: none;
+              height: 14px;
+              padding: 0;
+              border-radius: 0;
+              text-align: center;
+
+              &:focus {
+                border-color: #009688;
+              }
+            }
+          }
+
+          span {
+            font-size: 12px;
+          }
+        }
+
+        .svg-icon {
+          font-size: 12px;
+          margin: 0 6px;
+          cursor: pointer;
+
+          &.big-icon, &.dis-icon {
+            font-size: 15px;
+            margin: 0 4px;
+          }
+
+          &.dis-icon {
+            cursor: default;
+          }
+        }
+      }
+
+      .document-layout {
+        overflow: hidden;
+        height: calc(100% - 78px);
+        margin: 20px 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .document {
+          // transform-origin: 0 0;
+          background-size: contain;
+          position: relative;
+          cursor: url('~@/assets/images/icon/手势-张开.svg'), grab;
+          background-repeat: no-repeat;
+          width: 100%;
+
+          >img {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            pointer-events: none;
+            user-select: none;
+          }
+
+          &.draggable {
+            cursor: url('~@/assets/images/icon/手势-握紧.svg'), grabbing;
+          }
+
+          &.transition {
+            transition: all 0.3s linear;
+          }
+
+          .frame-mask {
+            position: absolute;
+            cursor: pointer;
+            pointer-events: none;
+
+            &.active, &:hover {
+              background: rgba(8, 135, 255, 0.1);
+              border: 1px solid #009688;
+              border-radius: 4px;
+            }
+          }
+        }
+      }
+    }
+
+    .drag-view {
+      width: 8px;
+      flex-shrink: 0;
+      flex-grow: 0;
+      cursor: col-resize;
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 100%;
+
+      &:after {
+        content: '';
+        width: 100%;
+        height: 30px;
+        background-image: repeating-linear-gradient(
+          to bottom,
+          #E5E7EC 0px,
+          #E5E7EC 1px,
+          transparent 1px,
+          transparent 4px
+        );
+      }
+    }
+
+    .ocr-result {
+      * {
+        user-select: text;
+      }
+
+      border: 1px solid #009688;
+      flex-shrink: 1;
+      flex-grow: 1;
+      padding: 0 16px;
+      background: #f7fbff;
+      position: relative;
+      height: 100%;
+
+      .border-corner {
+        position: absolute;
+        height: 20px;
+        width: 20px;
+        border: 4px solid #009688;
+
+        &.border-corner-1 {
+          top: 0;
+          left: 0;
+          border-right: none;
+          border-bottom: none;
+        }
+
+        &.border-corner-2 {
+          top: 0;
+          right: 0;
+          border-left: none;
+          border-bottom: none;
+        }
+
+        &.border-corner-3 {
+          bottom: 0;
+          left: 0;
+          border-right: none;
+          border-top: none;
+        }
+
+        &.border-corner-4 {
+          bottom: 0;
+          right: 0;
+          border-left: none;
+          border-top: none;
+        }
+      }
+
+      .ocr-title-bar {
+        display: flex;
+        height: 58px;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 16px;
+
+        .svg-icon {
+          margin-right: 8px;
+
+          &.download {
+            margin-right: 4px;
+          }
+        }
+
+        .ocr-title {
+          font-weight: 600;
+        }
+
+        span {
+          vertical-align: middle;
+        }
+      }
+
+      .ocr-text {
+        &::-webkit-scrollbar-thumb {
+          background: rgba(32, 45, 64, 0.5);
+        }
+
+        border: 1px solid #e3e8f0;
+        height: calc(100vh - 204px);
+        overflow: auto;
+        padding: 0 8px 12px;
+        background: #fff;
+        position: relative;
+
+        .text {
+          line-height: 26px;
+          padding: 0 8px;
+          border: 1px solid #fff;
+
+          &:not(:last-child) {
+            margin-bottom: 8px;
+          }
+
+          &:hover {
+            background: #f6f9fb;
+            cursor: pointer;
+          }
+
+          &.active {
+            background: rgba(8, 135, 255, 0.1);
+            border: 1px solid #009688;
+            border-radius: 4px;
+          }
+        }
+      }
+    }
+  }
+}
