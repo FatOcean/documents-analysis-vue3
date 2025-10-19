@@ -111,8 +111,8 @@ const page = ref({})
 const activeName = ref('')
 const activeDocumentIndex = ref(0)
 const tabsArray = ref([])
-const newStaticData = ref(props.documentData.documents)
-const documents = ref(props.documentData.documents[0].data)
+const newStaticData = computed(() => props.documentData.documents)
+const documents = computed(() => props.documentData.documents[0].data)
 const activeTableType = ref('')
 const fieldName = ref('')
 const checkedNull = ref(false)
@@ -128,7 +128,6 @@ const originLocation = computed(() => {
 // Methods
 const updateStaticData = (name) => {
   const data = newStaticData.value.find((item) => item.name === name).data
-  console.log(data, "data")
   documents.value = data
 }
 

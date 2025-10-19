@@ -20,9 +20,10 @@ const goBack = () => {
 };
 const router = useRouter(); 
 const documentData = ref(data[0]);
-
+console.log(documentData.value, "documentData");
 const productSelect = (item) => {
   console.log(item, "item");
+  documentData.value = item
 }
 </script>
 <style lang="scss" scoped>
